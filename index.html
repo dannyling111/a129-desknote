@@ -345,6 +345,16 @@
           <div class="stat"><span>官方专业</span><b>${stats.byFamily.official}</b></div>
           <div class="stat"><span>大学金融</span><b>${stats.byFamily.university}</b></div>
         </div>
+        <div class="block">
+          <p class="kicker">X 研报页试点</p>
+          <p class="muted" style="margin:8px 0 0;font-size:14px">${esc((D.ledgerPilot||{}).note || "")}</p>
+          <p class="chips" style="margin-top:12px">
+            ${((D.ledgerPilot&&D.ledgerPilot.orgs)||[]).map(s => {
+              const og = D.orgs.find(x => x.id === s.orgId);
+              return og ? `<a href="#/org/${esc(s.orgId)}"><button>${esc(og.nameZh)}</button></a>` : "";
+            }).join(" ")}
+          </p>
+        </div>
         <a href="#/stats" class="block" style="display:block">
           <p class="kicker">产量台账</p>
           <p>过去一年 ${(D.pubs.total).toLocaleString("zh-CN")} 篇标题件，其中干货 ${D.pubs.substance.toLocaleString("zh-CN")} 篇。打开可排序大表 →</p>
@@ -419,6 +429,10 @@
       ));
       const pub = pubBy[o.id];
       const W = D.window || { labels: [], yearTags: [] };
+      const posts = (D.xLedger || []).filter(p => p.orgId === o.id).sort((a,b) => a.postedAt < b.postedAt ? 1 : -1);
+      const pilot = ((D.ledgerPilot && D.ledgerPilot.orgs) || []).find(s => s.orgId === o.id);
+      const kindZh = (D.meta && D.meta.LEDGER_KIND_ZH) || {};
+      const day = (iso) => { const d = new Date(iso); return (d.getUTCMonth()+1) + "月" + d.getUTCDate() + "日"; };
       $("#app").innerHTML = `
         <div class="detail">
           <p><a class="subtle" href="#/?f=${o.family}">← 机构库</a></p>
@@ -445,6 +459,29 @@
               <p class="chips" style="margin-top:12px">${(pub.keywords||[]).map(k => `<span class="badge">${esc(k)}</span>`).join(" ")}</p>
               <p style="margin-top:12px"><a href="#/stats?open=${esc(o.id)}">在产量大表里打开</a></p>
             </div>` : ""}
+          ${posts.length ? `
+            <h2 style="font-family:Newsreader,Georgia,serif;font-weight:500;margin-top:40px">X 上的研报页</h2>
+            <p class="muted" style="font-size:14px">试点样本 · ${esc(pilot ? pilot.window : "")} · @${esc(pilot ? pilot.handle : "")}。按时间新到旧。说明和结论写在表里，右边是完整链接。</p>
+            <div class="table-wrap" style="margin-top:12px">
+              <table>
+                <thead><tr><th>日期</th><th>方面</th><th>这篇讲什么</th><th>结论</th><th>链接</th></tr></thead>
+                <tbody>
+                  ${posts.map(p => `
+                    <tr>
+                      <td class="mono subtle" style="white-space:nowrap">${esc(day(p.postedAt))}<div style="margin-top:6px"><span class="badge">${esc(kindZh[p.kind] || p.kind)}</span></div>${p.paperId ? `<div class="subtle" style="font-size:11px;margin-top:4px">${esc(p.paperId)}</div>` : ""}</td>
+                      <td><div>${esc(p.topic)}</div><div class="subtle" style="font-size:12px;margin-top:4px">${esc(p.title)}</div></td>
+                      <td class="muted">${esc(p.summary)}</td>
+                      <td>${esc(p.conclusion)}</td>
+                      <td style="white-space:nowrap">
+                        <a href="https://x.com/${esc(p.handle)}/status/${esc(p.id)}" target="_blank" rel="noreferrer">看 X 帖</a>
+                        ${p.paperUrl ? `<div style="margin-top:8px"><a class="muted" href="${esc(p.paperUrl)}" target="_blank" rel="noreferrer">原文</a></div>` : ""}
+                      </td>
+                    </tr>`).join("")}
+                </tbody>
+              </table>
+            </div>
+            <p class="subtle" style="font-size:12px;margin-top:8px">${posts.length} 条</p>
+          ` : ""}
           <div class="block">
             <p class="kicker">旗舰产品</p>
             <p class="chips">${(o.products||[]).map(p => `<span class="badge accent">${esc(p)}</span>`).join(" ") || "—"}</p>
