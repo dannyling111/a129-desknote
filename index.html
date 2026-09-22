@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DeskNote 机构库 · 产量统计</title>
-  <meta name="description" content="140 家机构过去一年发了多少篇、多少是干货。可排序筛选的产量大表。" />
+  <title>DeskNote 研报台 · 预测引擎</title>
+  <meta name="description" content="带着问题看研报。20 个预测、短中长期跨资产、机构点标在象限上。" />
   <meta name="theme-color" content="#0c0d0e" />
   <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -111,6 +111,11 @@
       .two { grid-template-columns: 1fr !important; }
       .monthgrid { grid-template-columns: repeat(3, 1fr); }
     }
+
+    .rail, .quad { width: 100%; display: block; }
+    .chartbox { overflow-x: auto; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+    .empty-cell { color: var(--subtle); }
+    .formula { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
   </style>
 </head>
 <body>
@@ -118,6 +123,7 @@
     <div class="wrap" style="padding-bottom:12px;padding-top:12px;display:flex;align-items:baseline;gap:12px">
       <a class="brand" href="#/">DeskNote</a>
       <nav class="nav">
+        <a href="#/forecast" id="nav-forecast">预测</a>
         <a href="#/" id="nav-org">机构库</a>
         <a href="#/stats" id="nav-stats">产量统计</a>
       </nav>
@@ -126,6 +132,7 @@
   </header>
   <main class="wrap" id="app"></main>
   <script src="./data.js"></script>
+  <script src="./forecast-ui.js"></script>
   <script>
     const D = window.DESKNOTE;
     const $ = (sel, el=document) => el.querySelector(sel);
@@ -139,6 +146,9 @@
     function route() {
       const h = (location.hash || "#/").replace(/^#/, "");
       if (h === "/stats" || h.startsWith("/stats?")) return { page: "stats" };
+      if (h === "/forecast" || h.startsWith("/forecast?")) return { page: "forecast" };
+      const fq = h.match(/^\/?forecast\/([^/?]+)/);
+      if (fq) return { page: "forecastq", id: decodeURIComponent(fq[1]) };
       const m = h.match(/^\/?org\/([^/?]+)/);
       if (m) return { page: "org", id: decodeURIComponent(m[1]) };
       return { page: "list" };
@@ -147,10 +157,13 @@
     function render() {
       const r = route();
       document.querySelectorAll(".nav a").forEach(a => a.classList.remove("on"));
-      const nav = document.getElementById(r.page === "stats" ? "nav-stats" : "nav-org");
+      const navId = r.page === "stats" ? "nav-stats" : r.page === "forecast" || r.page === "forecastq" ? "nav-forecast" : "nav-org";
+      const nav = document.getElementById(navId);
       if (nav) nav.classList.add("on");
       if (r.page === "org") renderDetail(r.id);
       else if (r.page === "stats") renderStats();
+      else if (r.page === "forecast") renderForecast();
+      else if (r.page === "forecastq") renderForecastQ(r.id);
       else renderList();
     }
 
@@ -497,6 +510,8 @@
         </div>
       `;
     }
+
+
 
     window.addEventListener("hashchange", render);
     render();
