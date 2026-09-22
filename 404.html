@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>DeskNote</title>
+    <script>
+      (function () {
+        var base = "/a129-desknote";
+        var path = location.pathname;
+        if (path.indexOf(base) === 0) path = path.slice(base.length) || "/";
+        location.replace(base + "/#" + path + location.search);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

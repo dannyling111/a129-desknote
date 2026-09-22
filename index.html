@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DeskNote 机构库</title>
+  <meta name="description" content="140 家卖方研究部、买方观点、官方与大学。逐家核验有没有研报。" />
+  <meta name="theme-color" content="#0c0d0e" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0c0d0e;
+      --surface: #151618;
+      --surface-2: #1c1d20;
+      --fg: #f1efe8;
+      --muted: #8f8e88;
+      --subtle: #6b6a66;
+      --border: #2a2b2e;
+      --accent: #d8dbe2;
+      --good: #8fad90;
+      --bad: #c98982;
+      --warn: #c4b08a;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      line-height: 1.5;
+    }
+    a { color: inherit; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button {
+      font: inherit;
+      cursor: pointer;
+      color: inherit;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    button.on { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    button.ghost { border-color: transparent; color: var(--muted); }
+    button.ghost.on { background: var(--surface-2); color: var(--fg); }
+    header {
+      position: sticky; top: 0; z-index: 10;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg) 90%, transparent);
+      backdrop-filter: blur(12px);
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 16px 20px 64px; }
+    .brand { font-family: Newsreader, Georgia, serif; font-size: 20px; }
+    .kicker { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--subtle); }
+    h1 { font-family: Newsreader, Georgia, serif; font-size: 40px; font-weight: 500; letter-spacing: -0.03em; margin: 8px 0 0; }
+    .lead { max-width: 40rem; color: var(--muted); font-size: 14px; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 24px 0; }
+    .stat { border: 1px solid var(--border); background: var(--surface); border-radius: 16px; padding: 16px; }
+    .stat b { display: block; font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 500; }
+    .stat span { color: var(--subtle); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+    input[type=search] {
+      width: 100%; max-width: 320px; height: 40px;
+      border: 1px solid var(--border); border-radius: 10px;
+      background: var(--surface); color: var(--fg); padding: 0 12px; font: inherit;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--subtle); font-weight: 500; padding: 8px 12px; background: var(--surface-2); }
+    td { padding: 12px; border-top: 1px solid var(--border); vertical-align: top; }
+    tr { cursor: pointer; }
+    tr:hover td { background: var(--surface); }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 16px; }
+    .badge {
+      display: inline-flex; align-items: center; white-space: nowrap;
+      border: 1px solid var(--border); border-radius: 2px;
+      padding: 1px 6px; font-size: 10px; letter-spacing: 0.06em; color: var(--muted);
+    }
+    .badge.good { color: var(--good); border-color: color-mix(in srgb, var(--good) 30%, transparent); }
+    .badge.bad { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 30%, transparent); }
+    .badge.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
+    .badge.accent { color: var(--fg); background: color-mix(in srgb, var(--accent) 10%, transparent); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+    .muted { color: var(--muted); } .subtle { color: var(--subtle); } .mono { font-family: "IBM Plex Mono", monospace; }
+    .detail h1 { font-size: 36px; }
+    .block { border: 1px solid var(--border); background: var(--surface); border-radius: 16px; padding: 16px; margin: 12px 0; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .empty { padding: 32px; color: var(--muted); }
+    @media (max-width: 720px) {
+      h1 { font-size: 32px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .hide-sm { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="padding-bottom:12px;padding-top:12px;display:flex;align-items:baseline;gap:12px">
+      <a class="brand" href="#/">DeskNote</a>
+      <span class="subtle" style="font-size:11px;letter-spacing:.22em;text-transform:uppercase">机构库</span>
+      <span style="margin-left:auto;font-size:12px" class="subtle">A129 · dannyling111</span>
+    </div>
+  </header>
+  <main class="wrap" id="app">
+        <p class="kicker">Atlas</p>
+        <h1>机构库</h1>
+        <p class="lead">席位是谁在转，这里是谁在写。先按顶尖投行研究部逐家核验：有完整 note 机器的留下，顾问投行没有研报也登记，避免以后混进雷达。</p>
+        <div class="stats">
+          <div class="stat"><span>卖方研究部</span><b>61 / 67</b></div>
+          <div class="stat"><span>买方会分享</span><b>29</b></div>
+          <div class="stat"><span>官方专业</span><b>20</b></div>
+          <div class="stat"><span>大学金融</span><b>20</b></div>
+        </div>
+        <p class="subtle" style="font-size:12px">67 / 140 家 · 卖方投行</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>机构</th><th>分类</th><th>研究部</th>
+              <th class="hide-sm">入口</th><th class="hide-sm">电讯</th><th class="hide-sm">旗舰</th>
+            </tr></thead>
+            <tbody>
+              
+                <tr data-id="gs">
+                  <td><div>高盛</div><div class="subtle" style="font-size:12px">GS · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全球大行</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯高频</td>
+                  <td class="hide-sm subtle">GS Research</td>
+                </tr>
+                <tr data-id="jpm">
+                  <td><div>摩根大通</div><div class="subtle" style="font-size:12px">JPM · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全球大行</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯高频</td>
+                  <td class="hide-sm subtle">JPM Global Research</td>
+                </tr>
+                <tr data-id="ms">
+                  <td><div>摩根士丹利</div><div class="subtle" style="font-size:12px">MS · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全球大行</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">电讯高频</td>
+                  <td class="hide-sm subtle">MS Research</td>
+                </tr>
+                <tr data-id="bofa">
+                  <td><div>美银证券</div><div class="subtle" style="font-size:12px">BofA · 纽约 / 夏洛特</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全球大行</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯高频</td>
+                  <td class="hide-sm subtle">BofA Global Research</td>
+                </tr>
+                <tr data-id="citi">
+                  <td><div>花旗</div><div class="subtle" style="font-size:12px">Citi · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全球大行</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯高频</td>
+                  <td class="hide-sm subtle">Citi Research</td>
+                </tr>
+                <tr data-id="barclays">
+                  <td><div>巴克莱</div><div class="subtle" style="font-size:12px">BARC · 伦敦</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全球大行</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯高频</td>
+                  <td class="hide-sm subtle">Barclays Research</td>
+                </tr>
+                <tr data-id="ubs">
+                  <td><div>瑞银</div><div class="subtle" style="font-size:12px">UBS · 苏黎世</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全球大行</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">电讯高频</td>
+                  <td class="hide-sm subtle">UBS Global Research</td>
+                </tr>
+                <tr data-id="db">
+                  <td><div>德意志银行</div><div class="subtle" style="font-size:12px">DB · 法兰克福</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全球大行</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">DB Research</td>
+                </tr>
+                <tr data-id="wells">
+                  <td><div>富国证券</div><div class="subtle" style="font-size:12px">WFS · 纽约 / 夏洛特</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Wells Fargo Securities Research</td>
+                </tr>
+                <tr data-id="hsbc">
+                  <td><div>汇丰</div><div class="subtle" style="font-size:12px">HSBC · 伦敦</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">HSBC Global Research</td>
+                </tr>
+                <tr data-id="bnp">
+                  <td><div>巴黎银行 / Exane</div><div class="subtle" style="font-size:12px">BNPP · 巴黎</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">BNP Paribas Exane Research</td>
+                </tr>
+                <tr data-id="socgen">
+                  <td><div>兴业银行（法）</div><div class="subtle" style="font-size:12px">SG · 巴黎</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">SG Cross Asset Research</td>
+                </tr>
+                <tr data-id="jefferies">
+                  <td><div>杰富瑞</div><div class="subtle" style="font-size:12px">JEF · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Jefferies Research</td>
+                </tr>
+                <tr data-id="rbc">
+                  <td><div>加拿大皇家银行</div><div class="subtle" style="font-size:12px">RBC · 多伦多</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">RBC Capital Markets Research</td>
+                </tr>
+                <tr data-id="td">
+                  <td><div>道明证券</div><div class="subtle" style="font-size:12px">TD · 多伦多</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">TD Securities Research</td>
+                </tr>
+                <tr data-id="bmo">
+                  <td><div>蒙特利尔银行</div><div class="subtle" style="font-size:12px">BMO · 多伦多</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">BMO Capital Markets Research</td>
+                </tr>
+                <tr data-id="scotia">
+                  <td><div>丰业银行</div><div class="subtle" style="font-size:12px">BNS · 多伦多</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Scotia GBM Research</td>
+                </tr>
+                <tr data-id="stanchart">
+                  <td><div>渣打</div><div class="subtle" style="font-size:12px">STAN · 伦敦</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Standard Chartered Global Research</td>
+                </tr>
+                <tr data-id="macquarie">
+                  <td><div>麦格理</div><div class="subtle" style="font-size:12px">MQG · 悉尼</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Macquarie Research</td>
+                </tr>
+                <tr data-id="nomura">
+                  <td><div>野村</div><div class="subtle" style="font-size:12px">NMR · 东京</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Nomura Research</td>
+                </tr>
+                <tr data-id="mizuho">
+                  <td><div>瑞穗</div><div class="subtle" style="font-size:12px">MFG · 东京</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Mizuho Securities Research</td>
+                </tr>
+                <tr data-id="smbc">
+                  <td><div>三井住友日兴</div><div class="subtle" style="font-size:12px">SMBC · 东京</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">SMBC Nikko Research</td>
+                </tr>
+                <tr data-id="daiwa">
+                  <td><div>大和证券</div><div class="subtle" style="font-size:12px">Daiwa · 东京</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Daiwa Research</td>
+                </tr>
+                <tr data-id="santander">
+                  <td><div>桑坦德</div><div class="subtle" style="font-size:12px">SAN · 马德里</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Santander Corporate &amp; Investment Banking Research</td>
+                </tr>
+                <tr data-id="ing">
+                  <td><div>ING</div><div class="subtle" style="font-size:12px">ING · 阿姆斯特丹</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">ING Think</td>
+                </tr>
+                <tr data-id="unicredit">
+                  <td><div>裕信</div><div class="subtle" style="font-size:12px">UCG · 米兰</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">UniCredit Research</td>
+                </tr>
+                <tr data-id="commerzbank">
+                  <td><div>德国商业银行</div><div class="subtle" style="font-size:12px">CBK · 法兰克福</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Commerzbank Research</td>
+                </tr>
+                <tr data-id="nordea">
+                  <td><div>北欧联合银行</div><div class="subtle" style="font-size:12px">NDA · 赫尔辛基</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Nordea Research</td>
+                </tr>
+                <tr data-id="danske">
+                  <td><div>丹麦银行</div><div class="subtle" style="font-size:12px">DANSKE · 哥本哈根</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Danske Bank Research</td>
+                </tr>
+                <tr data-id="natixis">
+                  <td><div>法国外贸银行</div><div class="subtle" style="font-size:12px">Natixis · 巴黎</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">全能券商</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Natixis CIB Research</td>
+                </tr>
+                <tr data-id="evercore">
+                  <td><div>Evercore ISI</div><div class="subtle" style="font-size:12px">EVR · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯高频</td>
+                  <td class="hide-sm subtle">Evercore ISI Research</td>
+                </tr>
+                <tr data-id="wolfe">
+                  <td><div>Wolfe</div><div class="subtle" style="font-size:12px">Wolfe · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Wolfe Research</td>
+                </tr>
+                <tr data-id="bernstein">
+                  <td><div>Bernstein</div><div class="subtle" style="font-size:12px">Bernstein · 纽约 / 伦敦</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Bernstein Blackbook</td>
+                </tr>
+                <tr data-id="redburn">
+                  <td><div>Redburn</div><div class="subtle" style="font-size:12px">Redburn · 伦敦</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Redburn Atlantic Research</td>
+                </tr>
+                <tr data-id="autonomous">
+                  <td><div>Autonomous</div><div class="subtle" style="font-size:12px">Auto · 伦敦 / 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Credit Signpost</td>
+                </tr>
+                <tr data-id="piper">
+                  <td><div>Piper Sandler</div><div class="subtle" style="font-size:12px">PIPR · 明尼阿波利斯</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Piper Sandler Research</td>
+                </tr>
+                <tr data-id="rj">
+                  <td><div>Raymond James</div><div class="subtle" style="font-size:12px">RJF · 圣彼得堡</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Raymond James Equity Research</td>
+                </tr>
+                <tr data-id="stifel">
+                  <td><div>Stifel</div><div class="subtle" style="font-size:12px">SF · 圣路易斯</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Stifel Equity Research</td>
+                </tr>
+                <tr data-id="kbw">
+                  <td><div>KBW</div><div class="subtle" style="font-size:12px">KBW · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">KBW Research</td>
+                </tr>
+                <tr data-id="berenberg">
+                  <td><div>Berenberg</div><div class="subtle" style="font-size:12px">Berenberg · 汉堡</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Berenberg Equity Research</td>
+                </tr>
+                <tr data-id="kepler">
+                  <td><div>Kepler Cheuvreux</div><div class="subtle" style="font-size:12px">KECH · 巴黎</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Kepler Cheuvreux Research</td>
+                </tr>
+                <tr data-id="clsa">
+                  <td><div>中信里昂</div><div class="subtle" style="font-size:12px">CLSA · 香港</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">CLSA Research</td>
+                </tr>
+                <tr data-id="oppenheimer">
+                  <td><div>Oppenheimer</div><div class="subtle" style="font-size:12px">OPY · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Oppenheimer Equity Research</td>
+                </tr>
+                <tr data-id="baird">
+                  <td><div>Baird</div><div class="subtle" style="font-size:12px">Baird · 密尔沃基</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Baird Equity Research</td>
+                </tr>
+                <tr data-id="truist">
+                  <td><div>Truist</div><div class="subtle" style="font-size:12px">TFC · 亚特兰大</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Truist Securities Research</td>
+                </tr>
+                <tr data-id="cantor">
+                  <td><div>Cantor</div><div class="subtle" style="font-size:12px">Cantor · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">精品卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Cantor Fitzgerald Research</td>
+                </tr>
+                <tr data-id="cicc">
+                  <td><div>中金公司</div><div class="subtle" style="font-size:12px">CICC · 北京 / 香港</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">中资卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">中金研究</td>
+                </tr>
+                <tr data-id="citic">
+                  <td><div>中信证券</div><div class="subtle" style="font-size:12px">CITIC · 北京</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">中资卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">中信证券研究</td>
+                </tr>
+                <tr data-id="haitong">
+                  <td><div>海通证券</div><div class="subtle" style="font-size:12px">Haitong · 上海</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">中资卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">海通研究</td>
+                </tr>
+                <tr data-id="gtja">
+                  <td><div>国泰君安</div><div class="subtle" style="font-size:12px">GTJA · 上海</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">中资卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">国泰君安研究</td>
+                </tr>
+                <tr data-id="huatai">
+                  <td><div>华泰证券</div><div class="subtle" style="font-size:12px">HTSC · 南京 / 香港</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">中资卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">华泰研究</td>
+                </tr>
+                <tr data-id="gf">
+                  <td><div>广发证券</div><div class="subtle" style="font-size:12px">GF · 广州</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">中资卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">广发研究</td>
+                </tr>
+                <tr data-id="csc">
+                  <td><div>中信建投</div><div class="subtle" style="font-size:12px">CSC · 北京</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">中资卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">中信建投研究</td>
+                </tr>
+                <tr data-id="cms">
+                  <td><div>招商证券</div><div class="subtle" style="font-size:12px">CMS · 深圳</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">中资卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">招商证券研究</td>
+                </tr>
+                <tr data-id="orient">
+                  <td><div>东方证券</div><div class="subtle" style="font-size:12px">DFZQ · 上海</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">中资卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">东方证券研究所</td>
+                </tr>
+                <tr data-id="cgs">
+                  <td><div>中国银河</div><div class="subtle" style="font-size:12px">CGS · 北京</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">中资卖方</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">银河证券研究</td>
+                </tr>
+                <tr data-id="gavekal">
+                  <td><div>Gavekal</div><div class="subtle" style="font-size:12px">Gavekal · 香港</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">独立研究社</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Gavekal Research</td>
+                </tr>
+                <tr data-id="bca">
+                  <td><div>BCA</div><div class="subtle" style="font-size:12px">BCA · 蒙特利尔</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">独立研究社</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">BCA Global Investment Strategy</td>
+                </tr>
+                <tr data-id="strategas">
+                  <td><div>Strategas</div><div class="subtle" style="font-size:12px">Strategas · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">独立研究社</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">客户门户</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Strategas policy/macro research</td>
+                </tr>
+                <tr data-id="bianco">
+                  <td><div>Bianco</div><div class="subtle" style="font-size:12px">Bianco · 芝加哥</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">独立研究社</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Bianco Research</td>
+                </tr>
+                <tr data-id="hedgeye">
+                  <td><div>Hedgeye</div><div class="subtle" style="font-size:12px">Hedgeye · 斯坦福（康涅狄格）</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">独立研究社</div></td>
+                  <td><span class="badge good">完整研究部</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">电讯可见</td>
+                  <td class="hide-sm subtle">Hedgeye 订阅研究</td>
+                </tr>
+                <tr data-id="moelis">
+                  <td><div>Moelis</div><div class="subtle" style="font-size:12px">MC · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">顾问投行</div></td>
+                  <td><span class="badge bad">无研报</span></td>
+                  <td class="hide-sm subtle">不发布</td>
+                  <td class="hide-sm subtle">不上电讯</td>
+                  <td class="hide-sm subtle">—</td>
+                </tr>
+                <tr data-id="pjt">
+                  <td><div>PJT</div><div class="subtle" style="font-size:12px">PJT · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">顾问投行</div></td>
+                  <td><span class="badge bad">无研报</span></td>
+                  <td class="hide-sm subtle">不发布</td>
+                  <td class="hide-sm subtle">不上电讯</td>
+                  <td class="hide-sm subtle">—</td>
+                </tr>
+                <tr data-id="centerview">
+                  <td><div>Centerview</div><div class="subtle" style="font-size:12px">Centerview · 纽约</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">顾问投行</div></td>
+                  <td><span class="badge bad">无研报</span></td>
+                  <td class="hide-sm subtle">不发布</td>
+                  <td class="hide-sm subtle">不上电讯</td>
+                  <td class="hide-sm subtle">—</td>
+                </tr>
+                <tr data-id="qatalyst">
+                  <td><div>Qatalyst</div><div class="subtle" style="font-size:12px">Qatalyst · 旧金山</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">顾问投行</div></td>
+                  <td><span class="badge bad">无研报</span></td>
+                  <td class="hide-sm subtle">不发布</td>
+                  <td class="hide-sm subtle">不上电讯</td>
+                  <td class="hide-sm subtle">—</td>
+                </tr>
+                <tr data-id="lazard">
+                  <td><div>拉扎德</div><div class="subtle" style="font-size:12px">LAZ · 纽约 / 巴黎</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">顾问投行</div></td>
+                  <td><span class="badge warn">有限公开</span></td>
+                  <td class="hide-sm subtle">摘要公开</td>
+                  <td class="hide-sm subtle">很少上屏</td>
+                  <td class="hide-sm subtle">Lazard Asset Management 观点</td>
+                </tr>
+                <tr data-id="hli">
+                  <td><div>Houlihan Lokey</div><div class="subtle" style="font-size:12px">HLI · 洛杉矶</div></td>
+                  <td><span class="badge">卖方投行</span><div class="subtle" style="font-size:11px;margin-top:4px">顾问投行</div></td>
+                  <td><span class="badge warn">有限公开</span></td>
+                  <td class="hide-sm subtle">公开可下</td>
+                  <td class="hide-sm subtle">不上电讯</td>
+                  <td class="hide-sm subtle">行业估值更新</td>
+                </tr>
+            </tbody>
+          </table>
+        </div>
+
+  </main>
+  <script src="./data.js"></script>
+  <script>
+    const D = window.DESKNOTE;
+    const $ = (sel, el=document) => el.querySelector(sel);
+    const ESC = { "&": "&" + "amp;", "<": "&" + "lt;", ">": "&" + "gt;", '"': "&" + "quot;", "'": "&#39;" };
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ESC[c]);
+    const tone = (r) => r === "full" ? "good" : r === "none" ? "bad" : "warn";
+
+    function route() {
+      const h = (location.hash || "#/").replace(/^#/, "");
+      const m = h.match(/^\/?org\/([^/?]+)/);
+      if (m) return { page: "org", id: decodeURIComponent(m[1]) };
+      return { page: "list" };
+    }
+
+    function render() {
+      const r = route();
+      if (r.page === "org") renderDetail(r.id);
+      else renderList();
+    }
+
+    function renderList() {
+      const params = new URLSearchParams((location.hash.split("?")[1] || ""));
+      const family = params.get("f") || "sellside";
+      const research = params.get("r") || "all";
+      const q = params.get("q") || "";
+      const stats = D.stats;
+      const rows = D.orgs.filter(o => {
+        if (family !== "all" && o.family !== family) return false;
+        if (research !== "all" && o.research !== research) return false;
+        if (q) {
+          const blob = [o.name, o.nameZh, o.short, o.hq, o.check, o.why, ...(o.products||[]), ...(o.aliases||[])].join(" ").toLowerCase();
+          if (!blob.includes(q.toLowerCase())) return false;
+        }
+        return true;
+      });
+      $("#app").innerHTML = `
+        <p class="kicker">Atlas</p>
+        <h1>机构库</h1>
+        <p class="lead">席位是谁在转，这里是谁在写。先按顶尖投行研究部逐家核验：有完整 note 机器的留下，顾问投行没有研报也登记，避免以后混进雷达。</p>
+        <div class="stats">
+          <div class="stat"><span>卖方研究部</span><b>${stats.sellFull} / ${stats.byFamily.sellside}</b></div>
+          <div class="stat"><span>买方会分享</span><b>${stats.buyShare}</b></div>
+          <div class="stat"><span>官方专业</span><b>${stats.byFamily.official}</b></div>
+          <div class="stat"><span>大学金融</span><b>${stats.byFamily.university}</b></div>
+        </div>
+        <input id="q" type="search" placeholder="搜机构、产品、别名" value="${esc(q)}" />
+        <div class="toolbar" id="fam">
+          ${[["all","全部分类"],["sellside","卖方投行"],["buyside","买方资管"],["official","官方专业"],["university","大学研究"]].map(([k,l]) =>
+            `<button data-f="${k}" class="${family===k?"on":""}">${l}</button>`).join("")}
+        </div>
+        <div class="toolbar" id="res">
+          ${[["all","研究部不限"],["full","完整研究部"],["limited","有限公开"],["none","无研报"]].map(([k,l]) =>
+            `<button class="ghost ${research===k?"on":""}" data-r="${k}">${l}</button>`).join("")}
+        </div>
+        <p class="subtle" style="font-size:12px">${rows.length} / ${D.orgs.length} 家</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>机构</th><th>分类</th><th>研究部</th>
+              <th class="hide-sm">入口</th><th class="hide-sm">电讯</th><th class="hide-sm">旗舰</th>
+            </tr></thead>
+            <tbody>
+              ${rows.map(o => `
+                <tr data-id="${esc(o.id)}">
+                  <td><div>${esc(o.nameZh)}</div><div class="subtle" style="font-size:12px">${esc(o.short)} · ${esc(o.hq)}</div></td>
+                  <td><span class="badge">${esc(D.meta.FAMILY_ZH[o.family])}</span><div class="subtle" style="font-size:11px;margin-top:4px">${esc(D.meta.TIER_ZH[o.tier])}</div></td>
+                  <td><span class="badge ${tone(o.research)}">${esc(D.meta.RESEARCH_ZH[o.research])}</span></td>
+                  <td class="hide-sm subtle">${esc(D.meta.ACCESS_ZH[o.access])}</td>
+                  <td class="hide-sm subtle">${esc(D.meta.LEAK_ZH[o.leak])}</td>
+                  <td class="hide-sm subtle">${esc((o.products||[])[0] || "—")}</td>
+                </tr>`).join("") || `<tr><td colspan="6" class="empty">没有匹配的机构。</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      `;
+      $("#q").addEventListener("input", (e) => {
+        const p = new URLSearchParams();
+        if (family !== "sellside") p.set("f", family); else p.set("f", family);
+        p.set("f", family);
+        if (research !== "all") p.set("r", research);
+        if (e.target.value) p.set("q", e.target.value);
+        history.replaceState(null, "", "#/?" + p.toString());
+        renderList();
+        $("#q").focus();
+        const v = $("#q").value; $("#q").setSelectionRange(v.length, v.length);
+      });
+      $("#fam").addEventListener("click", (e) => {
+        const b = e.target.closest("button"); if (!b) return;
+        goList(b.dataset.f, research, q);
+      });
+      $("#res").addEventListener("click", (e) => {
+        const b = e.target.closest("button"); if (!b) return;
+        goList(family, b.dataset.r, q);
+      });
+      $("#app").querySelectorAll("tr[data-id]").forEach(tr => {
+        tr.addEventListener("click", () => { location.hash = "#/org/" + tr.dataset.id; });
+      });
+    }
+
+    function goList(f, r, q) {
+      const p = new URLSearchParams();
+      p.set("f", f);
+      if (r && r !== "all") p.set("r", r);
+      if (q) p.set("q", q);
+      location.hash = "#/?" + p.toString();
+    }
+
+    function renderDetail(id) {
+      const o = D.orgs.find(x => x.id === id);
+      if (!o) { $("#app").innerHTML = `<p class="lead">没有这家机构。</p><p><a href="#/">返回机构库</a></p>`; return; }
+      const desks = D.desks.filter(d => (d.banks||[]).some(b =>
+        [o.name, o.nameZh, o.short, ...(o.aliases||[])].some(a => a.toLowerCase() === String(b).toLowerCase())
+      ));
+      $("#app").innerHTML = `
+        <div class="detail">
+          <p><a class="subtle" href="#/?f=${o.family}">← 机构库</a></p>
+          <p class="kicker">${esc(D.meta.FAMILY_ZH[o.family])} · ${esc(D.meta.TIER_ZH[o.tier])}</p>
+          <h1>${esc(o.nameZh)}</h1>
+          <p class="muted">${esc(o.name)} · ${esc(o.short)} · ${esc(o.hq)} · ${esc(D.meta.REGION_ZH[o.region] || o.region)}</p>
+          <p class="chips" style="margin-top:12px">
+            <span class="badge ${tone(o.research)}">${esc(D.meta.RESEARCH_ZH[o.research])}</span>
+            <span class="badge">${esc(D.meta.ACCESS_ZH[o.access])}</span>
+            <span class="badge">${esc(D.meta.LEAK_ZH[o.leak])}</span>
+          </p>
+          <div class="block"><p class="kicker">核验</p><p>${esc(o.check)}</p></div>
+          <div class="block"><p class="kicker">为什么进库</p><p class="muted">${esc(o.why)}</p></div>
+          <div class="block">
+            <p class="kicker">旗舰产品</p>
+            <p class="chips">${(o.products||[]).map(p => `<span class="badge accent">${esc(p)}</span>`).join(" ") || "—"}</p>
+            <p class="kicker" style="margin-top:16px">覆盖</p>
+            <p class="chips">${(o.coverage||[]).map(c => `<span class="badge">${esc(D.meta.COVERAGE_ZH[c] || c)}</span>`).join(" ")}</p>
+          </div>
+          <p style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+            ${o.portal ? `<a href="${esc(o.portal)}" target="_blank" rel="noreferrer"><button class="on">研究入口</button></a>` : ""}
+            ${(o.handles||[]).map(h => `<a href="https://x.com/${esc(h)}" target="_blank" rel="noreferrer"><button>@${esc(h)}</button></a>`).join("")}
+          </p>
+          <h2 style="font-family:Newsreader,Georgia,serif;font-weight:500;margin-top:40px">转这篇的席位</h2>
+          ${desks.length ? desks.map(d => `<div class="block"><b>${esc(d.nameZh)}</b> <span class="subtle">@${esc(d.handle)}</span><p class="muted" style="margin:6px 0 0;font-size:14px">${esc(d.why)}</p></div>`).join("") : `<p class="muted">这 50 席里还没有稳定转它的账号——原厂公开节奏慢，或本来就不走电讯。</p>`}
+        </div>
+      `;
+    }
+
+    window.addEventListener("hashchange", render);
+    render();
+  </script>
+</body>
+</html>
